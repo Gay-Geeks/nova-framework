@@ -1,6 +1,6 @@
 import { BitFieldResolvable, Client, ClientOptions, GatewayIntentBits, GatewayIntentsString, GuildMember, Snowflake } from 'discord.js';
 import { ClientSettings, OnAllCommands } from './clientSettings';
-import { client, CommandHook, Logger, LoggerConfiguration } from '..';
+import { client, CommandHook, Context, Logger, LoggerConfiguration } from '..';
 
 export class ClientBuilder<DB> {
 	private readonly settings: ClientSettings<DB>;
@@ -81,7 +81,7 @@ export class ClientBuilder<DB> {
 		return this;
 	}
 
-	public setGetPermissionLevel(getter: (member: GuildMember) => Promise<number>) {
+	public setGetPermissionLevel(getter: (ctx: Context<DB>, member: GuildMember) => Promise<number>) {
 		this.settings.getPermissionLevel = getter;
 		return this;
 	}

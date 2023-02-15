@@ -1,5 +1,5 @@
 import { ClientOptions, GuildMember } from 'discord.js';
-import { CommandHook, Logger, LoggerConfiguration } from '..';
+import { CommandHook, Context, Logger, LoggerConfiguration } from '..';
 
 /**
  * Hooks that get added before all other hooks on all commands
@@ -22,5 +22,5 @@ export interface ClientSettings<DB> {
 	loadDatabaseEntities?: (database: DB, paths: string[], logger: Logger) => Promise<void>;
 	setupDatabase?: (entityPaths: string[], logger: Logger) => Promise<DB>;
 	getConfig?: () => unknown;
-	getPermissionLevel: (member: GuildMember) => Promise<number>;
+	getPermissionLevel: (ctx: Context<DB>, member: GuildMember) => Promise<number>;
 }

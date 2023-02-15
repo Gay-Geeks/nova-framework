@@ -1,15 +1,6 @@
 import { ClientEvents, GuildMember } from 'discord.js';
-import { BotContext, EventContext, Logger } from '..';
+import { BotContext, Context, EventContext, Logger } from '..';
 import { ClientSettings } from '../client';
-
-function getPermissionLevel<DB>(settings: ClientSettings<DB>) {
-	return (member: GuildMember) => {
-		if (typeof settings.getPermissionLevel === 'function') {
-			return settings.getPermissionLevel(member);
-		}
-		return Promise.resolve(0)
-	}
-}
 
 export default function eventContext<K extends keyof ClientEvents, DB>(
 	event: ClientEvents[K],
@@ -21,8 +12,10 @@ export default function eventContext<K extends keyof ClientEvents, DB>(
 		event,
 		bot,
 		stage: 'before',
-		getPermissionLevel: getPermissionLevel(settings),
 		getConfig: settings.getConfig,
-		...logger
+		...logger,
+		getPermissionLevel: function (this: Context<DB>, member: GuildMember) {
+			return settings.getPermissionLevel(this, member)
+		},
 	};
 }

@@ -1,5 +1,5 @@
 import { EmbedBuilder, ChatInputCommandInteraction, GuildMember } from 'discord.js';
-import { BotContext, CommandContext, Logger, ReplyOptions } from '..';
+import { BotContext, CommandContext, Context, Logger, ReplyOptions } from '..';
 import { ClientSettings } from '../client';
 
 /**
@@ -26,15 +26,6 @@ async function reply(this: CommandContext, content?: string | EmbedBuilder, opti
 	return options?.returnReply ? this.interaction.fetchReply() : null;
 }
 
-function getPermissionLevel<DB>(settings: ClientSettings<DB>) {
-	return (member: GuildMember) => {
-		if (typeof settings.getPermissionLevel === 'function') {
-			return settings.getPermissionLevel(member);
-		}
-		return Promise.resolve(0)
-	}
-}
-
 /**
  * Create a CommandContext object;
  * holds information about the command and some useful methods
@@ -51,9 +42,11 @@ export default function commandContext<DB>(
 		commandUsed: command,
 		bot,
 		stage: 'before',
-		getPermissionLevel: getPermissionLevel(settings),
 		getConfig: settings.getConfig,
 		reply,
-		...logger
+		...logger,
+		getPermissionLevel: function (this: Context<DB>, member: GuildMember) {
+			return settings.getPermissionLevel(this, member)
+		},
 	};
 }
