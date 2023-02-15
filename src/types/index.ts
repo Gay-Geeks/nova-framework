@@ -11,6 +11,7 @@ import {
 	APIMessage,
 	APIApplicationCommandOptionChoice,
 	Snowflake,
+	GuildMember,
 } from 'discord.js';
 import { schedule } from 'node-cron';
 
@@ -54,7 +55,7 @@ export interface Event<E extends keyof ClientEvents, DB = undefined> {
 export interface BotContext<DB = undefined> {
 	db: DB;
 	commands: Command<DB>[];
-	schedule: schedule;
+	schedule: typeof schedule;
 	events: EventEmitter;
 }
 

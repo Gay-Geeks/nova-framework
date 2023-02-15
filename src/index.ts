@@ -1,4 +1,4 @@
-export type {
+export {
 	HookStage,
 	Context,
 	BotContext,
@@ -12,7 +12,7 @@ export type {
 	ReplyOptions,
 	LoggerConfiguration,
 	Logger
-} from './types'
+} from './types';
 
 export * as hooks from './hooks';
 
