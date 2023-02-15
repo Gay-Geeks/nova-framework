@@ -1,6 +1,6 @@
 import { BitFieldResolvable, Client, ClientOptions, GatewayIntentBits, GatewayIntentsString, GuildMember, Snowflake } from 'discord.js';
 import { ClientSettings, OnAllCommands } from './clientSettings';
-import { client, CommandHook, LoggerConfiguration } from '..';
+import { client, CommandHook, Logger, LoggerConfiguration } from '..';
 
 export class ClientBuilder<DB> {
 	private readonly settings: ClientSettings<DB>;
@@ -67,7 +67,7 @@ export class ClientBuilder<DB> {
 		return this;
 	}
 
-	public setLoadDatabaseEntities(loader: (database: DB, paths: string[]) => Promise<void>) {
+	public setLoadDatabaseEntities(loader: (database: DB, paths: string[], logger: Logger) => Promise<void>) {
 		this.settings.loadDatabaseEntities = loader;
 		return this;
 	}

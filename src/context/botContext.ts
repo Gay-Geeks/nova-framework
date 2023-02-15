@@ -9,7 +9,7 @@ import { ClientSettings } from '../client';
  */
 export default function createBotContext<DB>(settings: ClientSettings<DB>, commands: Command<DB>[]): BotContext<DB> {
 	return {
-		db: settings.database,
+		db: settings.database!,
 		commands,
 		schedule,
 		events: new EventEmitter()

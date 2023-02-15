@@ -29,8 +29,10 @@ export async function client<DB>(settings: ClientSettings<DB>) {
 	const modules = await loadModules<DB>(logger, settings);
 
 	// Load database entities
-	if (typeof settings.loadDatabaseEntities === 'function') {
-		await settings.loadDatabaseEntities(settings.database, modules.entities);
+	if (settings.database && typeof settings.loadDatabaseEntities === 'function') {
+		await settings.loadDatabaseEntities(settings.database, modules.entities, logger);
+	} else if (settings.setupDatabase) {
+		settings.database = await settings.setupDatabase(modules.entities, logger);
 	}
 
 	// Create the bot context which will be passed to all command and event handlers
