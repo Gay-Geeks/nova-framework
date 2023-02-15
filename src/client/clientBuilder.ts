@@ -5,10 +5,9 @@ import { client, CommandHook, Logger, LoggerConfiguration } from '..';
 export class ClientBuilder<DB> {
 	private readonly settings: ClientSettings<DB>;
 
-	public constructor(token: string, database: DB) {
+	public constructor(token: string) {
 		this.settings = {
 			token,
-			database,
 			getPermissionLevel: () => Promise.resolve(0),
 			clientOptions: {
 				intents: [
@@ -69,6 +68,11 @@ export class ClientBuilder<DB> {
 
 	public setLoadDatabaseEntities(loader: (database: DB, paths: string[], logger: Logger) => Promise<void>) {
 		this.settings.loadDatabaseEntities = loader;
+		return this;
+	}
+
+	public setSetupDatabase(setupFunc: (entityPaths: string[], logger: Logger) => Promise<DB>) {
+		this.settings.setupDatabase = setupFunc;
 		return this;
 	}
 
