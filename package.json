@@ -15,6 +15,7 @@
     "test:lint": "eslint --ext ts src",
     "lint": "eslint --fix --ext ts src"
   },
+  "type": "module",
   "files": [
     "lib"
   ],
