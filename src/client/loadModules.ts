@@ -82,32 +82,31 @@ export default async function loadModules<DB>(logger: Logger, settings: ClientSe
 
 	for (const module_path of all_paths) {
 		try {
-			for (const module of await promises.readdir(module_path)) {
+			for (const module of await promises.readdir(module_path, { withFileTypes: true })) {
 				try {
-					const srcPart = module === 'src' ? '.' : 'src';
-
-					const stat = await promises.stat(join(module_path, module, srcPart));
-					if (!stat.isDirectory()) {
+					if (!module.isDirectory()) {
 						continue;
 					}
 
-					await logger.logToFile('default', `loading module ${module}`);
+					const srcPart = module.name === 'src' ? '.' : 'src';
 
-					const moduleParts = await promises.readdir(join(module_path, module, srcPart));
+					await logger.logToFile('default', `loading module ${module.name}`);
+
+					const moduleParts = await promises.readdir(join(module_path, module.name, srcPart));
 					for (const part of moduleParts.map(p => p.toLowerCase())) {
 						if (part === 'commands') {
-							commands.push(...(await loadCommands<DB>(join(module_path, module, srcPart, part), module, logger)));
-							await logger.logToFile('default', `loaded commands of ${module}`);
+							commands.push(...(await loadCommands<DB>(join(module_path, module.name, srcPart, part), module.name, logger)));
+							await logger.logToFile('default', `loaded commands of ${module.name}`);
 						} else if (part === 'events') {
-							events.push(...(await loadEvents<DB>(join(module_path, module, srcPart, part), logger)));
-							await logger.logToFile('default', `loaded events of ${module}`);
+							events.push(...(await loadEvents<DB>(join(module_path, module.name, srcPart, part), logger)));
+							await logger.logToFile('default', `loaded events of ${module.name}`);
 						} else if (part === 'entities') {
-							entities.push(join(module_path, module, srcPart, part, '*.js'));
-							await logger.logToFile('default', `loaded entities of ${module}`);
+							entities.push(join(module_path, module.name, srcPart, part, '*.js'));
+							await logger.logToFile('default', `loaded entities of ${module.name}`);
 						}
 					}
 				} catch (e) {
-					await logger.logError(`failed to load ${module}:\n${(e as Error).stack!}`);
+					await logger.logError(`failed to load ${module.name}:\n${(e as Error).stack!}`);
 					continue;
 				}
 			}
