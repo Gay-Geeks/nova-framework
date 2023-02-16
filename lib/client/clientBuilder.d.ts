@@ -11,6 +11,7 @@ export declare class ClientBuilder<DB> {
     setDefaultLogChannel(channelId: Snowflake): this;
     setOnAllCommands(onAll: OnAllCommands<DB>): this;
     setDefaultCommandErrorHooks(hooks: CommandHook<DB>[]): this;
+    addModulePaths(...modules: string[]): void;
     setLoadDatabaseEntities(loader: (database: DB, paths: string[], logger: Logger) => Promise<void>): this;
     setSetupDatabase(setupFunc: (entityPaths: string[], logger: Logger) => Promise<DB>): this;
     setGetConfig(getter: () => unknown): this;

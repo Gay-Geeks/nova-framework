@@ -6,10 +6,6 @@ import { ClientEvents } from 'discord.js';
 import { ClientSettings, OnAllCommands } from './clientSettings';
 import { Command, Event, Logger } from '..';
 
-const MODULE_PATHS = [
-	join(__dirname, '..', 'modules'),
-	join('.', 'modules')
-];
 const jsFileRegex = /.+\.js$/;
 
 // Loads all commands from their files in the command directory of the module
@@ -79,13 +75,18 @@ export default async function loadModules<DB>(logger: Logger, settings: ClientSe
 	const events: Event<keyof ClientEvents, DB>[] = [];
 	const entities: string[] = [];
 
-	for (const module_path of MODULE_PATHS) {
+	let all_paths = settings.modulePaths
+	if (!all_paths) {
+		all_paths = [join('.', 'src')]
+	}
+
+	for (const module_path of all_paths) {
 		try {
 			for (const module of await promises.readdir(module_path)) {
 				await logger.logToFile('default', `loading module ${module}`);
 				try {
 					const moduleParts = await promises.readdir(join(module_path, module, 'src'));
-					for (const part of moduleParts) {
+					for (const part of moduleParts.map(p => p.toLowerCase())) {
 						if (part === 'commands') {
 							commands.push(...(await loadCommands<DB>(join(module_path, module, 'src', part), module, logger)));
 						} else if (part === 'events') {
@@ -105,7 +106,7 @@ export default async function loadModules<DB>(logger: Logger, settings: ClientSe
 	}
 
 	if (commands.length < 1 && events.length < 1) {
-		await logger.logError(`No commands or event handlers have been found!\nThe following directories were checked: ${MODULE_PATHS.join(',')}`);
+		await logger.logError(`No commands or event handlers have been found!\nThe following directories were checked: ${all_paths.join(',')}`);
 	}
 
 	if (settings.onAllCommands){

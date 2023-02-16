@@ -19,6 +19,7 @@ export interface ClientSettings<DB> {
 	clientOptions?: ClientOptions;
 	loggerOptions?: LoggerConfiguration;
 	onAllCommands?: OnAllCommands<DB>;
+	modulePaths?: string[];
 	loadDatabaseEntities?: (database: DB, paths: string[], logger: Logger) => Promise<void>;
 	setupDatabase?: (entityPaths: string[], logger: Logger) => Promise<DB>;
 	getConfig?: () => unknown;

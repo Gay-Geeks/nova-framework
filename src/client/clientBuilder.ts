@@ -8,6 +8,7 @@ export class ClientBuilder<DB> {
 	public constructor(token: string) {
 		this.settings = {
 			token,
+			modulePaths: [],
 			getPermissionLevel: () => Promise.resolve(0),
 			clientOptions: {
 				intents: [
@@ -64,6 +65,10 @@ export class ClientBuilder<DB> {
 			this.settings.onAllCommands = {error: hooks}
 		}
 		return this;
+	}
+
+	public addModulePaths(...modules: string[]) {
+		this.settings.modulePaths = this.settings.modulePaths!.concat(modules)
 	}
 
 	public setLoadDatabaseEntities(loader: (database: DB, paths: string[], logger: Logger) => Promise<void>) {
