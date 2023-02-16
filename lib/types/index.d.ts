@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { Message, ClientEvents, BaseMessageOptions, Client, StickerResolvable, EmbedBuilder, ApplicationCommandOption, ChatInputCommandInteraction, APIMessage, APIApplicationCommandOptionChoice, Snowflake, GuildMember } from 'discord.js';
+import { Message, ClientEvents, BaseMessageOptions, Client, StickerResolvable, EmbedBuilder, ApplicationCommandOption, ChatInputCommandInteraction, APIMessage, APIApplicationCommandOptionChoice, Snowflake, GuildMember, GuildManager, UserManager, ChannelManager, BaseGuildEmojiManager } from 'discord.js';
 import { schedule } from 'node-cron';
 /**
  * The different stages of the hooks system for commands and events
@@ -31,7 +31,9 @@ export interface Event<E extends keyof ClientEvents, DB = undefined> {
 }
 /**
  * The BotContext, which holds general information about the bot and tools that are needed everywhere.
- * It contains the database connection, the list of commands, a scheduler and an event emitter.
+ * It contains the discord client, database connection, the list of commands, a scheduler and an event emitter.
+ *
+ * It also provides some attributes and methods from the discord client as shortcut.
  */
 export interface BotContext<DB = undefined> {
     db: DB;
@@ -39,6 +41,12 @@ export interface BotContext<DB = undefined> {
     events: EventEmitter;
     readonly commands: Command<DB>[];
     readonly client: Client;
+    guilds: GuildManager;
+    users: UserManager;
+    emojis: BaseGuildEmojiManager;
+    channels: ChannelManager;
+    login: (token?: string) => Promise<string>;
+    destroy: () => void;
 }
 /**
  * The structure with all the options that can be set for a slash command

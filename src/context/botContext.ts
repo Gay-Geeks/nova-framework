@@ -14,6 +14,18 @@ export default function createBotContext<DB>(settings: ClientSettings<DB>, clien
 		commands,
 		schedule,
 		db: settings.database!,
-		events: new EventEmitter()
+		events: new EventEmitter(),
+
+		guilds: client.guilds,
+		users: client.users,
+		channels: client.channels,
+		emojis: client.emojis,
+
+		login: function (this, token?: string) {
+			return this.client.login(token ?? settings.token)
+		},
+		destroy: function (this) {
+			return this.client.destroy()
+		}
 	};
 }
