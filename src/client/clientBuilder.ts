@@ -1,6 +1,6 @@
-import { BitFieldResolvable, Client, ClientOptions, GatewayIntentBits, GatewayIntentsString, GuildMember, Snowflake } from 'discord.js';
+import { BitFieldResolvable, ClientOptions, GatewayIntentBits, GatewayIntentsString, GuildMember, Snowflake } from 'discord.js';
 import { ClientSettings, OnAllCommands } from './clientSettings';
-import { client, CommandHook, Context, Logger, LoggerConfiguration } from '..';
+import { BotContext, client, CommandHook, Context, Logger, LoggerConfiguration } from '..';
 
 export class ClientBuilder<DB> {
 	private readonly settings: ClientSettings<DB>;
@@ -92,7 +92,7 @@ export class ClientBuilder<DB> {
 		return this;
 	}
 
-	public async build(): Promise<Client> {
+	public async build(): Promise<[BotContext<DB>, Logger]> {
 		return client(this.settings)
 	}
 }

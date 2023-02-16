@@ -1,6 +1,6 @@
-import { BitFieldResolvable, Client, ClientOptions, GatewayIntentsString, GuildMember, Snowflake } from 'discord.js';
+import { BitFieldResolvable, ClientOptions, GatewayIntentsString, GuildMember, Snowflake } from 'discord.js';
 import { OnAllCommands } from './clientSettings';
-import { CommandHook, Context, Logger, LoggerConfiguration } from '..';
+import { BotContext, CommandHook, Context, Logger, LoggerConfiguration } from '..';
 export declare class ClientBuilder<DB> {
     private readonly settings;
     constructor(token: string);
@@ -16,6 +16,6 @@ export declare class ClientBuilder<DB> {
     setSetupDatabase(setupFunc: (entityPaths: string[], logger: Logger) => Promise<DB>): this;
     setGetConfig(getter: () => unknown): this;
     setGetPermissionLevel(getter: (ctx: Context<DB>, member: GuildMember) => Promise<number>): this;
-    build(): Promise<Client>;
+    build(): Promise<[BotContext<DB>, Logger]>;
 }
 //# sourceMappingURL=clientBuilder.d.ts.map

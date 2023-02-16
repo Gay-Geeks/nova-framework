@@ -41,7 +41,7 @@ export interface OptionChoiceHolder<DB = undefined> {
  * The structure with all the options that can be set for an event handler
  */
 export interface Event<E extends keyof ClientEvents, DB = undefined> {
-	on: E;
+	readonly on: E;
 	handler: EventHook<E, DB>;
 	before?: EventHook<E, DB>[];
 	after?: EventHook<E, DB>[];
@@ -54,9 +54,10 @@ export interface Event<E extends keyof ClientEvents, DB = undefined> {
  */
 export interface BotContext<DB = undefined> {
 	db: DB;
-	commands: Command<DB>[];
 	schedule: typeof schedule;
 	events: EventEmitter;
+	readonly commands: Command<DB>[];
+	readonly client: Client;
 }
 
 /**
@@ -87,11 +88,11 @@ export interface Context<DB = undefined> {
 	error?: unknown;
 	skip?: boolean;
 	stage: HookStage;
-	bot: BotContext<DB>;
+	readonly bot: BotContext<DB>;
 	/**
 	 * Returns the config for the bot if provided
 	 */
-	getConfig?: () => any;
+	getConfig?: () => unknown;
 	/**
 	 * Returns the permission level of the given member using the function provided to the Client.
 	 * If no function was provided, it returns 0 always
@@ -115,7 +116,7 @@ export type CommandContext<DB = undefined> = {
  * It contains the client object and the event that triggered the handler
  */
 export type EventContext<E extends keyof ClientEvents, DB = undefined> = {
-	event: ClientEvents[E];
+	readonly event: ClientEvents[E];
 } & Context<DB> &
 	Logger;
 

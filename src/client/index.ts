@@ -3,6 +3,7 @@ import { ClientSettings } from './clientSettings';
 import commandHandler, { uploadCommands } from './commandHandler';
 import eventHandler from './eventHandler';
 import loadModules from './loadModules';
+import { BotContext, Logger } from '..';
 import createBotContext from '../context/botContext';
 import { createLogger } from '../logging';
 
@@ -12,7 +13,7 @@ export type { ClientSettings };
 /**
  * Creates the bot client and loads everything needed for it.
  */
-export async function client<DB>(settings: ClientSettings<DB>) {
+export async function client<DB>(settings: ClientSettings<DB>): Promise<[BotContext<DB>, Logger]> {
 	// Create the discord client
 	const client = new Client(settings.clientOptions ?? {
 		intents: [
@@ -36,7 +37,7 @@ export async function client<DB>(settings: ClientSettings<DB>) {
 	}
 
 	// Create the bot context which will be passed to all command and event handlers
-	const bot = createBotContext(settings, modules.commands);
+	const bot = createBotContext(settings, client, modules.commands);
 
 	// Create the command handler and have it listen to incoming command interactions
 	const handleCommand = commandHandler(modules.commands, bot, logger, settings);
@@ -70,6 +71,6 @@ export async function client<DB>(settings: ClientSettings<DB>) {
 		bot.events.emit('reloadCommands');
 	});
 
-	// Return the created client
-	return client;
+	// Return the created bot and logger
+	return [bot, logger];
 }
