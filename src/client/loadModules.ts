@@ -85,14 +85,16 @@ export default async function loadModules<DB>(logger: Logger, settings: ClientSe
 			for (const module of await promises.readdir(module_path)) {
 				await logger.logToFile('default', `loading module ${module}`);
 				try {
-					const moduleParts = await promises.readdir(join(module_path, module, 'src'));
+					const srcPart = module === 'src' ? '.' : 'src';
+
+					const moduleParts = await promises.readdir(join(module_path, module, srcPart));
 					for (const part of moduleParts.map(p => p.toLowerCase())) {
 						if (part === 'commands') {
-							commands.push(...(await loadCommands<DB>(join(module_path, module, 'src', part), module, logger)));
+							commands.push(...(await loadCommands<DB>(join(module_path, module, srcPart, part), module, logger)));
 						} else if (part === 'events') {
-							events.push(...(await loadEvents<DB>(join(module_path, module, 'src', part), logger)));
+							events.push(...(await loadEvents<DB>(join(module_path, module, srcPart, part), logger)));
 						} else if (part === 'entities') {
-							entities.push(join(module_path, module, 'src', part, '*.js'));
+							entities.push(join(module_path, module, srcPart, part, '*.js'));
 						}
 					}
 				} catch (e) {

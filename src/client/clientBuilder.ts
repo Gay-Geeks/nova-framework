@@ -69,6 +69,7 @@ export class ClientBuilder<DB> {
 
 	public addModulePaths(...modules: string[]) {
 		this.settings.modulePaths = this.settings.modulePaths!.concat(modules)
+		return this;
 	}
 
 	public setLoadDatabaseEntities(loader: (database: DB, paths: string[], logger: Logger) => Promise<void>) {
