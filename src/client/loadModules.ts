@@ -96,13 +96,13 @@ export default async function loadModules<DB>(logger: Logger, settings: ClientSe
 					for (const part of moduleParts.map(p => p.toLowerCase())) {
 						if (part === 'commands') {
 							commands.push(...(await loadCommands<DB>(join(module_path, module.name, srcPart, part), module.name, logger)));
-							await logger.logToFile('default', `loaded commands of ${module.name}`);
+							await logger.logToFile('default', `- loaded commands of ${module.name}`);
 						} else if (part === 'events') {
 							events.push(...(await loadEvents<DB>(join(module_path, module.name, srcPart, part), logger)));
-							await logger.logToFile('default', `loaded events of ${module.name}`);
+							await logger.logToFile('default', `- loaded events of ${module.name}`);
 						} else if (part === 'entities') {
 							entities.push(join(module_path, module.name, srcPart, part, '*.js'));
-							await logger.logToFile('default', `loaded entities of ${module.name}`);
+							await logger.logToFile('default', `- loaded entities of ${module.name}`);
 						}
 					}
 				} catch (e) {

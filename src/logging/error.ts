@@ -27,6 +27,12 @@ function splitMessage(text: string, title = ''): string[] {
 }
 
 async function clientLogError(logger: Logger, error: unknown, channel_id?: string) {
+	if (typeof error === 'undefined') {
+		error = new Error('Got an undefined error to log')
+	} else if (typeof error === 'string') {
+		error = new Error(error)
+	}
+
 	let output = '';
 	let logMessage = '';
 	if (error instanceof DiscordAPIError || error instanceof HTTPError) {
