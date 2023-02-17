@@ -1,7 +1,12 @@
 import { ClientEvents } from 'discord.js';
 import { ClientSettings } from './clientSettings';
-import { BotContext, Logger, Event, EventContext } from '..';
+import { BotContext, Logger, Event, EventContext, EventHook } from '..';
 import { eventContext } from '../context';
+
+function hookOrSkip<K extends keyof ClientEvents, DB>(ctx: EventContext<K, DB>, hook: EventHook<K, DB>) {
+	if (ctx.skip) return ctx;
+	return hook(ctx);
+}
 
 // Handle calling an individual event handler for its event
 async function handleEvent<K extends keyof ClientEvents, DB>(
@@ -23,7 +28,7 @@ async function handleEvent<K extends keyof ClientEvents, DB>(
 			try {
 				// Let the error hooks handle the error
 				await handler.error.reduce(
-					(chain, hook) => chain.then((ctx) => hook(ctx) ),
+					(chain, hook) => chain.then((ctx) => hook(ctx)),
 					Promise.resolve({
 						...ctx,
 						error: e,
@@ -40,7 +45,7 @@ async function handleEvent<K extends keyof ClientEvents, DB>(
 	// Call the event handler
 	await (handler.before
 		? // Call the before hooks of the event handler if they exist
-		  handler.before.reduce((chain, hook) => chain.then((ctx) => hook(ctx) ), Promise.resolve(ctx))
+		  handler.before.reduce((chain, hook) => chain.then((ctx) => hookOrSkip(ctx, hook)), Promise.resolve(ctx))
 		: Promise.resolve(ctx)
 	)
 		.then((ctx) =>
@@ -56,7 +61,7 @@ async function handleEvent<K extends keyof ClientEvents, DB>(
 			!ctx.skip && handler.after
 				? // If there are after hooks and they haven't been skipped, call the after hooks
 				  handler.after.reduce(
-						(chain, hook) => chain.then((ctx) => hook(ctx) ),
+						(chain, hook) => chain.then((ctx) => hookOrSkip(ctx, hook)),
 						Promise.resolve({
 							...ctx,
 							stage: 'after',

@@ -100,9 +100,16 @@ export interface Command<DB = undefined> {
 export interface Context<DB = undefined> {
 	data?: unknown;
 	error?: unknown;
-	skip?: boolean;
 	stage: HookStage;
+
 	readonly bot: BotContext<DB>;
+	readonly client: Client;
+
+	/**
+	 * If true, all following hooks and/or the handler will be skipped, except for potential error hooks.
+	 */
+	skip?: boolean;
+
 	/**
 	 * Returns the config for the bot if provided
 	 */

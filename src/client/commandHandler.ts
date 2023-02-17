@@ -2,8 +2,13 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { ApplicationCommandOptionChoiceData, ChatInputCommandInteraction } from 'discord.js';
 import { ClientSettings } from './clientSettings';
-import { BotContext, Command, CommandContext, Logger } from '..';
+import { BotContext, Command, CommandContext, CommandHook, Logger } from '..';
 import { commandContext } from '../context';
+
+function hookOrSkip<DB>(ctx: CommandContext<DB>, hook: CommandHook<DB>) {
+	if (ctx.skip) return ctx;
+	return hook(ctx);
+}
 
 // Loads the choises by either returning undefined if undefined,
 // or else calling it with the bot context as the argument
@@ -84,7 +89,7 @@ async function runCommand<DB>(command: Command<DB>, interaction: ChatInputComman
 	// Call the commands
 	await (command.before
 		? // Call the before hooks of the command if they exist
-		  command.before.reduce((chain, hook) => chain.then(hook), Promise.resolve(ctx))
+		  command.before.reduce((chain, hook) => chain.then(ctx => hookOrSkip(ctx, hook)), Promise.resolve(ctx))
 		: Promise.resolve(ctx)
 	)
 		.then((ctx) =>
@@ -100,7 +105,7 @@ async function runCommand<DB>(command: Command<DB>, interaction: ChatInputComman
 			!ctx.skip && command.after
 				? // If there are after hooks and they haven't been skipped, call the after hooks
 				  command.after.reduce(
-						(chain, hook) => chain.then(hook),
+						(chain, hook) => chain.then(ctx => hookOrSkip(ctx, hook)),
 						Promise.resolve({
 							...ctx,
 							stage: 'after',
