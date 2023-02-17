@@ -1,4 +1,5 @@
 import { ClientEvents } from 'discord.js';
-import { CommandContext, EventContext } from '../types';
-export declare function skipIfError<DB, C extends EventContext<keyof ClientEvents, DB> | CommandContext<DB>>(hook: (ctx: C) => Promise<C>): (ctx: C) => Promise<C>;
+import { CommandHook, EventHook } from '../types';
+export declare function skipEventHooksIfError<E extends keyof ClientEvents, DB>(hook: EventHook<E, DB>): EventHook<E, DB>;
+export declare function skipCommandHooksIfError<DB>(hook: CommandHook<DB>): CommandHook<DB>;
 //# sourceMappingURL=skipIfError.d.ts.map
