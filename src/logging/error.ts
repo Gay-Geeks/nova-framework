@@ -1,4 +1,4 @@
-import { ChannelType, DiscordAPIError, HTTPError } from 'discord.js';
+import { ChannelType, DiscordAPIError, EmbedBuilder, HTTPError } from 'discord.js';
 import { Logger } from '../types';
 
 function splitMessage(text: string, title = ''): string[] {
@@ -27,26 +27,27 @@ function splitMessage(text: string, title = ''): string[] {
 }
 
 async function clientLogError(logger: Logger, error: unknown, channel_id?: string) {
-	if (typeof error === 'undefined') {
-		error = new Error('Got an undefined error to log')
-	} else if (typeof error === 'string') {
-		error = new Error(error)
-	}
-
 	let output = '';
 	let logMessage = '';
 	if (error instanceof DiscordAPIError || error instanceof HTTPError) {
 		output = `REST Route: ${error.method} ${error.url}\ndata: ${JSON.stringify(error.requestBody.json)}\n`;
 		logMessage = `REST Route: ${error.method} ${error.url}: `;
+	} else if (error instanceof EmbedBuilder) {
+		error = error.data.description ?? error.data.title
 	}
 
 	if (error instanceof Object && !(error instanceof Error)) {
 		Error.captureStackTrace(error);
 	}
 
-	const errorLike = error as Error;
-
-	console.error(errorLike);
+	let errorLike: Error;
+	if (typeof error === 'undefined') {
+		errorLike = new Error('Got an undefined error to log')
+	} else if (typeof error === 'string') {
+		errorLike = new Error(error)
+	} else {
+		errorLike = error as Error;
+	}
 
 	await logger.logToFile('error', `${logMessage}${errorLike.name}: ${errorLike.message}`);
 
