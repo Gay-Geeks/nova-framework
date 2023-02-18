@@ -2,12 +2,25 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { ApplicationCommandOptionChoiceData, ChatInputCommandInteraction } from 'discord.js';
 import { ClientSettings } from './clientSettings';
-import { BotContext, Command, CommandContext, CommandHook, Logger } from '..';
+import { BotContext, Command, CommandContext, CommandHook, HookStage, Logger } from '..';
 import { commandContext } from '../context';
 
+/**
+ * If ctx.skip, then skip, else run the hook
+ */
 function hookOrSkip<DB>(ctx: CommandContext<DB>, hook: CommandHook<DB>) {
 	if (ctx.skip) return ctx;
 	return hook(ctx);
+}
+
+/**
+ * A hook to set the stage of the context
+ */
+function setStage<DB>(stage: HookStage) {
+	return (ctx: CommandContext<DB>) => Promise.resolve({
+		...ctx,
+		stage
+	})
 }
 
 // Loads the choises by either returning undefined if undefined,
@@ -86,35 +99,16 @@ async function runCommand<DB>(command: Command<DB>, interaction: ChatInputComman
 		}
 	};
 
-	// Call the commands
-	await (command.before
-		? // Call the before hooks of the command if they exist
-		  command.before.reduce((chain, hook) => chain.then(ctx => hookOrSkip(ctx, hook)), Promise.resolve(ctx))
-		: Promise.resolve(ctx)
-	)
-		.then((ctx) =>
-			ctx.skip
-				? Promise.resolve(ctx)
-				: // Call the command itself is it hasn't been skipped
-				  command.command({
-						...ctx,
-						stage: 'handler',
-				  } as CommandContext<DB>),
-		)
-		.then((ctx) =>
-			!ctx.skip && command.after
-				? // If there are after hooks and they haven't been skipped, call the after hooks
-				  command.after.reduce(
-						(chain, hook) => chain.then(ctx => hookOrSkip(ctx, hook)),
-						Promise.resolve({
-							...ctx,
-							stage: 'after',
-						} as CommandContext<DB>),
-				  )
-				: ctx,
-		)
-		// If any error was thrown, handle the error
-		.catch(handleError);
+	await (command.before ?? []).reduce(
+		(chain, hook) => chain.then(ctx => hookOrSkip(ctx, hook)),
+		Promise.resolve(ctx))
+		.then(setStage('handler'))
+		.then(ctx => hookOrSkip(ctx, command.command))
+		.then(setStage('after'))
+		.then(ctx => (command.after ?? []).reduce(
+			(chain, hook) => chain.then(ctx => hookOrSkip(ctx, hook)),
+			Promise.resolve(ctx)
+		)).catch(handleError)
 }
 
 /**

@@ -1,11 +1,24 @@
 import { ClientEvents } from 'discord.js';
 import { ClientSettings } from './clientSettings';
-import { BotContext, Logger, Event, EventContext, EventHook } from '..';
+import { BotContext, Logger, Event, EventContext, EventHook, HookStage } from '..';
 import { eventContext } from '../context';
 
+/**
+ * If ctx.skip, then skip, else run the hook
+ */
 function hookOrSkip<K extends keyof ClientEvents, DB>(ctx: EventContext<K, DB>, hook: EventHook<K, DB>) {
 	if (ctx.skip) return ctx;
 	return hook(ctx);
+}
+
+/**
+ * A hook to set the stage of the context
+ */
+function setStage<K extends keyof ClientEvents, DB>(stage: HookStage) {
+	return (ctx: EventContext<K, DB>) => Promise.resolve({
+		...ctx,
+		stage
+	})
 }
 
 // Handle calling an individual event handler for its event
@@ -42,35 +55,17 @@ async function handleEvent<K extends keyof ClientEvents, DB>(
 		}
 	};
 
-	// Call the event handler
-	await (handler.before
-		? // Call the before hooks of the event handler if they exist
-		  handler.before.reduce((chain, hook) => chain.then((ctx) => hookOrSkip(ctx, hook)), Promise.resolve(ctx))
-		: Promise.resolve(ctx)
-	)
-		.then((ctx) =>
-			ctx.skip
-				? Promise.resolve(ctx)
-				: // Call the event handler itself if it hasn't been skipped
-				  handler.handler({
-						...ctx,
-						stage: 'handler',
-				  }) ,
-		)
-		.then((ctx) =>
-			!ctx.skip && handler.after
-				? // If there are after hooks and they haven't been skipped, call the after hooks
-				  handler.after.reduce(
-						(chain, hook) => chain.then((ctx) => hookOrSkip(ctx, hook)),
-						Promise.resolve({
-							...ctx,
-							stage: 'after',
-						} as EventContext<K, DB>),
-				  )
-				: Promise.resolve(ctx),
-		)
-		// If any error was thrown, handle the error
-		.catch(handleError);
+	// Handle the hooks and the event handler itself
+	await (handler.before ?? []).reduce(
+		(chain, hook) => chain.then(ctx => hookOrSkip(ctx, hook)),
+		Promise.resolve(ctx))
+		.then(setStage('handler'))
+		.then(ctx => hookOrSkip(ctx, handler.handler))
+		.then(setStage('after'))
+		.then(ctx => (handler.after ?? []).reduce(
+			(chain, hook) => chain.then(ctx => hookOrSkip(ctx, hook)),
+			Promise.resolve(ctx)
+		)).catch(handleError)
 }
 
 /**

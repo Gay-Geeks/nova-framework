@@ -11,7 +11,8 @@ export interface OnAllCommands<DB> {
 }
 
 /**
- * The Settings that can be provided to the Client when setting it up
+ * The Settings that can be provided to the Client when setting it up.
+ * It is advised to not build this directly, but to use the ClientBuilder
  */
 export interface ClientSettings<DB> {
 	token: string;

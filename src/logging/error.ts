@@ -51,7 +51,7 @@ async function clientLogError(logger: Logger, error: unknown, channel_id?: strin
 
 	await logger.logToFile('error', `${logMessage}${errorLike.name}: ${errorLike.message}`);
 
-	if (!channel_id) {
+	if (!channel_id || !logger.client.isReady()) {
 		return
 	}
 
