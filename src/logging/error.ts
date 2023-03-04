@@ -50,6 +50,7 @@ async function clientLogError(logger: Logger, error: unknown, channel_id?: strin
 	}
 
 	await logger.logToFile('error', `${logMessage}${errorLike.name}: ${errorLike.message}`);
+	errorLike.stack && console.error(errorLike.stack)
 
 	if (!channel_id || !logger.client.isReady()) {
 		return
@@ -73,6 +74,9 @@ export default async function logError(this: Logger, error: unknown) {
 	}
 	if (!channel) {
 		channel = this.configuration.errorLogChannel
+	}
+	if (!channel) {
+		channel = this.configuration.defaultLogChannel
 	}
 
 	await clientLogError(this, error, channel);
