@@ -2,6 +2,9 @@ import { BitFieldResolvable, ClientOptions, GatewayIntentBits, GatewayIntentsStr
 import { ClientSettings, OnAllCommands } from './clientSettings';
 import { BotContext, client, CommandHook, Context, Logger, LoggerConfiguration } from '..';
 
+/**
+ * A helper class to make constructing the ClientSettings easier and clearer
+ */
 export class ClientBuilder<DB> {
 	private readonly settings: ClientSettings<DB>;
 
@@ -92,6 +95,10 @@ export class ClientBuilder<DB> {
 		return this;
 	}
 
+	/**
+	 * Build the client with the ClientSettings that have been constructed.
+	 * Returns the BotContext and the Logger
+	 */
 	public async build(): Promise<[BotContext<DB>, Logger]> {
 		return client(this.settings)
 	}

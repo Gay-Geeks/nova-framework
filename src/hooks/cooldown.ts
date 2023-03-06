@@ -6,17 +6,22 @@ interface CommandRan {
 	last: Date;
 }
 
-export function cooldown<DB = undefined>(seconds: number, error: any = null): CommandHook<DB> {
+/**
+ * Checks if the command was already ran by the same user within the last x seconds as provided by the param.
+ * If it was, it throws an error if provided, or else sets ctx.skip to true.
+ * If the ctx.getPermissionLevel method returns a number higher than the given bypass param, or the command was ran in dms, this cooldown is ignored
+ */
+export function cooldown<DB = undefined>(seconds: number, error: any = null, bypass = 3): CommandHook<DB> {
 	const history: CommandRan[] = [];
 
 	// eslint-disable-next-line @typescript-eslint/require-await
 	return async (ctx: CommandContext<DB>) => {
 		const member = ctx.interaction.member as GuildMember | null;
 		if (member === null) {
-			throw ctx;
+			return ctx;
 		}
 
-		if (await ctx.getPermissionLevel(member) >= 3) {
+		if (await ctx.getPermissionLevel(member) >= bypass) {
 			return ctx;
 		}
 

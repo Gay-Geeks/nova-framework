@@ -1,1 +1,1 @@
-{"version":3,"file":"cooldown.d.ts","sourceRoot":"","sources":["../../src/hooks/cooldown.ts"],"names":[],"mappings":"AACA,OAAO,EAAkB,WAAW,EAAE,MAAM,IAAI,CAAC;AAOjD,wBAAgB,QAAQ,CAAC,EAAE,GAAG,SAAS,EAAE,OAAO,EAAE,MAAM,EAAE,KAAK,GAAE,GAAU,GAAG,WAAW,CAAC,EAAE,CAAC,CAuC5F"}
+{"version":3,"file":"cooldown.d.ts","sourceRoot":"","sources":["../../src/hooks/cooldown.ts"],"names":[],"mappings":"AACA,OAAO,EAAkB,WAAW,EAAE,MAAM,IAAI,CAAC;AAOjD;;;;GAIG;AACH,wBAAgB,QAAQ,CAAC,EAAE,GAAG,SAAS,EAAE,OAAO,EAAE,MAAM,EAAE,KAAK,GAAE,GAAU,EAAE,MAAM,SAAI,GAAG,WAAW,CAAC,EAAE,CAAC,CAuCxG"}

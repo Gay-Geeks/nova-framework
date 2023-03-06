@@ -1,1 +1,1 @@
-{"version":3,"file":"ignoreBotMessages.d.ts","sourceRoot":"","sources":["../../src/hooks/ignoreBotMessages.ts"],"names":[],"mappings":"AAAA,OAAO,EAAgB,SAAS,EAAE,MAAM,IAAI,CAAC;AAE7C,wBAAgB,iBAAiB,CAAC,EAAE,GAAG,SAAS,EAAE,KAAK,GAAE,GAAU,GAAG,SAAS,CAAC,eAAe,EAAE,EAAE,CAAC,CAYnG"}
+{"version":3,"file":"ignoreBotMessages.d.ts","sourceRoot":"","sources":["../../src/hooks/ignoreBotMessages.ts"],"names":[],"mappings":"AAAA,OAAO,EAAgB,SAAS,EAAE,MAAM,IAAI,CAAC;AAE7C;;;GAGG;AACH,wBAAgB,iBAAiB,CAAC,EAAE,GAAG,SAAS,EAAE,KAAK,GAAE,GAAU,GAAG,SAAS,CAAC,eAAe,EAAE,EAAE,CAAC,CAYnG"}
