@@ -1,6 +1,6 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import { ApplicationCommandOptionChoiceData, ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionChoiceData, ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
 import { ClientSettings } from './clientSettings';
 import { BotContext, Command, CommandContext, CommandHook, Logger } from '..';
 import { commandContext } from '../context';
@@ -26,18 +26,20 @@ function loadChoices<DB>(
 /**
  *  Uploads all the commands of the bot to discord as slash-commands
  */
-export async function uploadCommands<DB>(token: string, client_id: string, bot: BotContext<DB>) {
+export async function uploadCommands<DB>(token: string, client: Client, bot: BotContext<DB>) {
 	// Get a rest api client
 	const rest = new REST().setToken(token);
 
 	// Transform all of our command objects to the format discord uses
 	const discord_commands = (
 		await Promise.all(
-			bot.commands.map(async (c: Command<DB>) => ({
-				name: c.name,
-				description: c.description,
-				default_permission: c.permission_level === 0,
-				options: c.options
+			bot.commands.map(async (c: Command<DB>) => {
+				const cmd = new SlashCommandBuilder()
+					.setName(c.name)
+					.setDescription(c.description)
+					.setDefaultMemberPermissions(c.permission_level === 0 ? undefined : "0")
+					.toJSON()
+				cmd.options = c.options
 					? await Promise.all(
 							c.options.map(async (o) => ({
 								...o,
@@ -45,14 +47,15 @@ export async function uploadCommands<DB>(token: string, client_id: string, bot: 
 								// Load choices if any have been registered for this command
 								choices: await loadChoices(bot, c.optionChoices ? c.optionChoices[o.name] : undefined),
 							})),
-					  )
-					: undefined,
-			})),
+						)
+					: undefined
+				return cmd
+			}),
 		)
 	);
 
 	// Upload the commands to discord and get the returned objects as ApplicationCommands
-	await rest.put(Routes.applicationCommands(client_id), {
+	await rest.put(Routes.applicationCommands(client.user!.id), {
 		body: discord_commands,
 	});
 }

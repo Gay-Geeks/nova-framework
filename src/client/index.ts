@@ -63,7 +63,7 @@ export async function client<DB>(settings: ClientSettings<DB>): Promise<[BotCont
 
 	bot.events.on(
 		'reloadCommands',
-		() => void uploadCommands(settings.token, client.user!.id, bot).catch((error) => logger.logError(error)),
+		() => void uploadCommands(settings.token, client, bot).catch((error) => logger.logError(error)),
 	);
 
 	// On ready reload our commands, uploading them to discord and load all the members we can see to our database
