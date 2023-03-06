@@ -1,6 +1,6 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import { ApplicationCommandOptionChoiceData, ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
+import { ApplicationCommandOptionChoiceData, ChatInputCommandInteraction, Client, PermissionsBitField, SlashCommandBuilder } from 'discord.js';
 import { ClientSettings } from './clientSettings';
 import { BotContext, Command, CommandContext, CommandHook, HookStage, Logger } from '..';
 import { commandContext } from '../context';
@@ -50,7 +50,7 @@ export async function uploadCommands<DB>(token: string, client: Client, bot: Bot
 				const cmd = new SlashCommandBuilder()
 					.setName(c.name)
 					.setDescription(c.description)
-					.setDefaultMemberPermissions(c.permission_level === 0 ? undefined : "0")
+					.setDefaultMemberPermissions(c.permission_level === 0 ? undefined : PermissionsBitField.Flags.ManageGuild)
 					.toJSON()
 				cmd.options = c.options
 					? await Promise.all(
