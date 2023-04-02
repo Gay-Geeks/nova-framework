@@ -3,9 +3,6 @@ import { EmbedBuilder } from 'discord.js';
 import { Logger } from '..'
 
 export default async function logToFile(this: Logger, type: string, data: string | EmbedBuilder, ...args: any[]) {
-	if (!this.configuration.logFilePath)
-		return;
-
 	const now = new Date();
 	let message = `${now.toUTCString().slice(0, -4)}.${now.getUTCMilliseconds()}: ${type.toUpperCase()}: `;
 
@@ -26,6 +23,9 @@ export default async function logToFile(this: Logger, type: string, data: string
 	} else {
 		console.log(message);
 	}
+
+	if (!this.configuration.logFilePath)
+		return;
 
 	await appendFile(this.configuration.logFilePath, `${message}\n`);
 }
