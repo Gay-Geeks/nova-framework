@@ -17,16 +17,21 @@ export type { ClientSettings };
  */
 export async function client<DB>(settings: ClientSettings<DB>): Promise<[BotContext<DB>, Logger]> {
 	// Create the discord client
-	const client = new Client(settings.clientOptions ?? {
+	const clientOptions = settings.clientOptions ?? {
 		intents: [
 			GatewayIntentBits.Guilds,
 			GatewayIntentBits.DirectMessages,
 			GatewayIntentBits.GuildMessages
 		],
-	});
+	};
+	const client = new Client(clientOptions);
 
 	// Setup the logger
 	const logger = createLogger(client, settings.loggerOptions ?? {})
+
+	await logger.logToFile('debug', `Client created with intents: ${
+		Array.isArray(clientOptions.intents) ? clientOptions.intents.join(', ') : JSON.stringify(clientOptions.intents)
+	}`)
 
 	// Load all the modules from their directories
 	const modules = await loadModules<DB>(logger, settings);
